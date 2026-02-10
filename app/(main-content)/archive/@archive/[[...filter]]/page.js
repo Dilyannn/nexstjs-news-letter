@@ -10,6 +10,44 @@ import {
   getAllNews
 } from "@/lib/news";
 
+async function FilterHeader({ year, month }) {
+  const availableYears = await getAvailableNewsYears();
+  let links = availableYears;
+
+  if (
+    (year && !availableYears.includes(+year)) ||
+    (month && !(await getAvailableNewsMonths(year)).includes(+month))
+  ) {
+    throw new Error("Invalid filter.");
+  }
+
+  if (year && !month) {
+    links = await getAvailableNewsMonths(year);
+  }
+
+  if (year && month) {
+    links = [];
+  }
+
+  return (
+    <header id="archive-header">
+      <nav>
+        <ul>
+          {links.map((link) => {
+            const href = year ? `/archive/${year}/${link}` : `/archive/${link}`;
+
+            return (
+              <li key={link}>
+                <Link href={href}>{link}</Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </header>
+  );
+}
+
 async function NewsContent({ year, month }) {
   let news;
   if (year && !month) { 
@@ -33,46 +71,12 @@ export default async function FilteredNewsPage({ params }) {
   const selectedYear = filter?.[0];
   const selectedMonth = filter?.[1];
 
-  const availableYears = await getAvailableNewsYears();
-
-  if (
-    (selectedYear && !availableYears.includes(+selectedYear)) ||
-    (selectedMonth &&
-      !(await getAvailableNewsMonths(selectedYear)).includes(+selectedMonth))
-  ) {
-    throw new Error("Invalid filter.");
-  }
-
-  let links = availableYears;
-
-  if (selectedYear && !selectedMonth) {
-    links = await getAvailableNewsMonths(selectedYear);
-  }
-
-  if (selectedYear && selectedMonth) {
-    links = [];
-  }
-
   return (
     <>
-      <header id="archive-header">
-        <nav>
-          <ul>
-            {links.map((link) => {
-              const href = selectedYear
-                ? `/archive/${selectedYear}/${link}`
-                : `/archive/${link}`;
+      <Suspense fallback={<p>Loading filter...</p>}>
+        <FilterHeader year={selectedYear} month={selectedMonth} />
+      </Suspense>
 
-              return (
-                <li key={link}>
-                  <Link href={href}>{link}</Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </header>
-      
       <Suspense fallback={<p>Loading news...</p>}>
         <NewsContent year={selectedYear} month={selectedMonth} />
       </Suspense>
