@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Suspense } from "react";
+
 import NewsListItem from "@/components/NewsListItem";
 import {
   getAvailableNewsYears,
@@ -5,7 +8,23 @@ import {
   getNewsForYearAndMonth,
   getAvailableNewsMonths,
 } from "@/lib/news";
-import Link from "next/link";
+
+async function NewsContent({ year, month }) {
+  let news;
+  if (year && !month) { 
+    news = await getNewsForYear(year);
+  } else if (year && month) {
+    news = await getNewsForYearAndMonth(year, month);
+  }
+
+  let newsContent = <p>No news found for the selected period.</p>;
+
+  if (news && news.length > 0) {
+    newsContent = <NewsListItem news={news} />;
+  }
+
+  return newsContent;
+}  
 
 export default async function FilteredNewsPage({ params }) {
   const { filter } = await params;
@@ -13,7 +32,6 @@ export default async function FilteredNewsPage({ params }) {
   const selectedYear = filter?.[0];
   const selectedMonth = filter?.[1];
 
-  let news;
   let links = await getAvailableNewsYears(); // Default to years if something goes wrong, but usually overridden
 
   if (
@@ -27,19 +45,11 @@ export default async function FilteredNewsPage({ params }) {
   // NOTE: In strict catch-all [...filter], selectedYear will always be present (index 0).
 
   if (selectedYear && !selectedMonth) {
-    news = await getNewsForYear(selectedYear);
     links = await getAvailableNewsMonths(selectedYear);
   }
 
   if (selectedYear && selectedMonth) {
-    news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
     links = [];
-  }
-
-  let newsContent = <p>No news found for the selected period.</p>;
-
-  if (news && news.length > 0) {
-    newsContent = <NewsListItem news={news} />;
   }
 
   return (
@@ -61,7 +71,10 @@ export default async function FilteredNewsPage({ params }) {
           </ul>
         </nav>
       </header>
-      {newsContent}
+      
+      <Suspense fallback={<p>Loading news...</p>}>
+        <NewsContent year={selectedYear} month={selectedMonth} />
+      </Suspense>
     </>
   );
 }
