@@ -7,6 +7,7 @@ import {
   getNewsForYear,
   getNewsForYearAndMonth,
   getAvailableNewsMonths,
+  getAllNews
 } from "@/lib/news";
 
 async function NewsContent({ year, month }) {
@@ -32,17 +33,17 @@ export default async function FilteredNewsPage({ params }) {
   const selectedYear = filter?.[0];
   const selectedMonth = filter?.[1];
 
-  let links = await getAvailableNewsYears(); // Default to years if something goes wrong, but usually overridden
+  const availableYears = await getAvailableNewsYears();
 
   if (
-    (selectedYear && !(await getAvailableNewsYears()).includes(+selectedYear)) ||
+    (selectedYear && !availableYears.includes(+selectedYear)) ||
     (selectedMonth &&
       !(await getAvailableNewsMonths(selectedYear)).includes(+selectedMonth))
   ) {
     throw new Error("Invalid filter.");
   }
 
-  // NOTE: In strict catch-all [...filter], selectedYear will always be present (index 0).
+  let links = availableYears;
 
   if (selectedYear && !selectedMonth) {
     links = await getAvailableNewsMonths(selectedYear);
