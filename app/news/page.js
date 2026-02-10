@@ -1,14 +1,22 @@
-function page() {
+import Link from 'next/link';
+import { DATA_NEWS } from '@/news-data';
+
+function NewsPage() {
   return (
-    <div>
-      <h1>news</h1>
-      <ul>
-        <li><a href="/news/1">News 1</a></li>
-        <li><a href="/news/2">News 2</a></li>
-        <li><a href="/news/third-article">Third Article</a></li>
+    <>
+      <h1>News Page</h1>
+      <ul className="news-list">
+        {DATA_NEWS.map((newsItem) => (
+          <li key={newsItem.id}>
+            <Link href={`/news/${newsItem.slug}`}>
+              <img src={`/images/news/${newsItem.image}`} alt={newsItem.title} />
+              <span>{newsItem.title}</span>
+            </Link>
+          </li>
+        ))}
       </ul>
-    </div>
-  )
+    </>
+  );
 }
 
-export default page
+export default NewsPage;

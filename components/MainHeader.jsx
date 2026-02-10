@@ -1,20 +1,18 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
-function MainHeader() {
+export default function MainHeader() {
   return (
-    <header style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
+    <header id="main-header">
+      <div id="logo">
+        <Link href="/">NextNews</Link>
+      </div>
       <nav>
-        <ul style={{ listStyle: 'none', display: 'flex', gap: '1rem', margin: 0, padding: 0 }}>
+        <ul>
           <li>
-            <Link href="/">Home</Link>
-          </li>
-          <li>
-            <Link href="/news">Newsletter</Link>
+            <Link href="/news">News</Link>
           </li>
         </ul>
       </nav>
     </header>
-  )
+  );
 }
-
-export default MainHeader
