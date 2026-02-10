@@ -1,12 +1,11 @@
-import React from 'react'
-
 export default async function Page({ params }) {
-  const { blub } = await params
+  const { id } = await params
+  const newsId = id
 
   return (
     <div>
       <h1>News Article</h1>
-      <p>Article ID: {blub}</p>
+      <p>Article ID: {newsId}</p>
     </div>
   )
 }
