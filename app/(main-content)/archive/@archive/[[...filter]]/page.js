@@ -14,12 +14,12 @@ export default async function FilteredNewsPage({ params }) {
   const selectedMonth = filter?.[1];
 
   let news;
-  let links = getAvailableNewsYears(); // Default to years if something goes wrong, but usually overridden
+  let links = await getAvailableNewsYears(); // Default to years if something goes wrong, but usually overridden
 
   if (
-    (selectedYear && !getAvailableNewsYears().includes(+selectedYear)) ||
+    (selectedYear && !(await getAvailableNewsYears()).includes(+selectedYear)) ||
     (selectedMonth &&
-      !getAvailableNewsMonths(selectedYear).includes(+selectedMonth))
+      !(await getAvailableNewsMonths(selectedYear)).includes(+selectedMonth))
   ) {
     throw new Error("Invalid filter.");
   }
@@ -27,12 +27,12 @@ export default async function FilteredNewsPage({ params }) {
   // NOTE: In strict catch-all [...filter], selectedYear will always be present (index 0).
 
   if (selectedYear && !selectedMonth) {
-    news = getNewsForYear(selectedYear);
-    links = getAvailableNewsMonths(selectedYear);
+    news = await getNewsForYear(selectedYear);
+    links = await getAvailableNewsMonths(selectedYear);
   }
 
   if (selectedYear && selectedMonth) {
-    news = getNewsForYearAndMonth(selectedYear, selectedMonth);
+    news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
     links = [];
   }
 

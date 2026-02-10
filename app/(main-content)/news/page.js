@@ -1,11 +1,13 @@
 import NewsListItem from '@/components/NewsListItem';
-import { DATA_NEWS } from '@/news-data';
+import { getAllNews } from '@/lib/news';
 
-function NewsPage() {
+async function NewsPage() {
+  const news = await getAllNews();
+
   return (
     <>
       <h1>News Page</h1>
-      <NewsListItem news={DATA_NEWS} />
+      <NewsListItem news={news} />
     </>
   );
 }
